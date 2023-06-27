@@ -49,18 +49,18 @@ void main()
 
             if (sesionIniciada == 0)
             {
-                printf("Número de cuenta o contraseña incorrecta\n");
+                printf("N%cmero de cuenta o contrase%ca incorrecta\n" ,163, 164);
                 intentosLogin++;
             }
             else if (sesionIniciada == -1)
             {
-                printf("\nSu cuenta se encuentra bloqueada, comuníquese con la entidad bancaria para su restablecimiento\n");
+                printf("\nSu cuenta se encuentra bloqueada, comun%cquese con la entidad bancaria para su restablecimiento\n" , 161);
             }
 
         } while (sesionIniciada == 0 && intentosLogin <= 3);
         if (intentosLogin > 3)
         {
-            printf("\nNo se permiten más intentos. Su cuenta ha sido bloqueada, comuníquese con la entidad bancaria para su restablecimiento.\n");
+            printf("\nNo se permiten m%cs intentos. Su cuenta ha sido bloqueada, comun%cquese con la entidad bancaria para su restablecimiento.\n" ,160, 161);
             // FALTA BLOQUEAR CUENTA POR LIMITE DE INTENTOS
         }
 
@@ -73,8 +73,8 @@ void main()
             do
             {
                 printf("\n------ Bienvenido/a %s ------\n", nombreCliente[indiceClienteActual]);
-                printf("1)  Deposito.\n2)  Extraccion.\n3)  Consultar saldo.\n4)  Mostrar saldo y la cantidad de operaciones realizadas.\n5)  Cerrar Sesion.\n");
-                printf("Ingrese una opcion del menu: ");
+                printf("1)  Dep%csito.\n2)  Extracci%cn.\n3)  Consultar saldo.\n4)  Mostrar saldo y la cantidad de operaciones realizadas.\n5)  Cerrar Sesi%cn.\n" , 162, 162, 162);
+                printf("Ingrese una opci%cn del men%c: " ,162 ,163);
                 scanf("%i", &opcionMenu);
                 printf("\n");
                 switch (opcionMenu)
@@ -103,7 +103,7 @@ void main()
                     // Salir
                     break;
                 default:
-                    printf("Opcion invalida.\n");
+                    printf("Opci%cn inv%clida.\n" , 162, 160);
                     break;
                 }
 
@@ -111,7 +111,7 @@ void main()
         }
         if (intentosOperaciones >= 10)
         {
-            printf("Llego al limite de operaciones. Fin. Gracias!\n");
+            printf("Lleg%c al limite de operaciones. Fin. Gracias!\n" , 162);
         }
     }
 
@@ -128,9 +128,9 @@ int iniciarSesion(int nroCuentaCliente[], char contraseniaCliente[][20], char es
     char contrasenia[20];
 
     printf("\n------ INTENTO [%i/3] ------\n", intentos);
-    printf("Ingrese su número de cuenta: ");
+    printf("Ingrese su n%cmero de cuenta: " , 163);
     scanf("%i", &nroCuenta);
-    printf("Ingrese contraseña: ");
+    printf("Ingrese contrase%ca: " , 164);
     scanf("%s", &contrasenia);
 
     while (i < cantClientes)
@@ -164,11 +164,11 @@ void depositarSaldo(float saldoCliente[])
         scanf("%f", &saldoADepositar);
         if (saldoADepositar <= 0)
         {
-            printf("Deposito incorrecto.\n");
+            printf("Dep%csito incorrecto.\n" , 162);
         }
     } while (saldoADepositar <= 0);
     saldoCliente[indiceClienteActual] += saldoADepositar;
-    printf("Deposito realizado con exito.\n");
+    printf("Dep%csito realizado con exito.\n" , 162);
 }
 
 void retirarSaldo(float saldoCliente[])
@@ -177,20 +177,20 @@ void retirarSaldo(float saldoCliente[])
 
     do
     {
-        printf("ingrese la cantidad de dinero a retirar: ");
+        printf("Ingrese la cantidad de dinero a retirar: ");
         scanf("%f", &saldoARetirar);
         if (saldoARetirar > saldoCliente[indiceClienteActual])
         {
-            printf("Saldo en la cuenta Insuficiente.\n");
+            printf("El saldo en la cuenta es insuficiente.\n");
         }
         if (saldoARetirar < 0)
         {
-            printf("Saldo a retirar ingresado incorrecto.\n");
+            printf("El saldo ingresado a retirar es incorrecto.\n");
         }
     } while (saldoARetirar < 0 || saldoARetirar > saldoCliente[indiceClienteActual]);
 
     saldoCliente[indiceClienteActual] -= saldoARetirar;
-    printf("Extraccion exitosa.\n");
+    printf("Extracci%cn exitosa.\n" , 162);
 }
 
 void cargarClientes(int nroCuentaCliente[], char contraseniaCliente[][20], char nombreCliente[][20], float saldoCliente[], char estadoCliente[][10])
