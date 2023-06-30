@@ -9,9 +9,10 @@
 #include <stdlib.h>
 #include <string.h>
 
-int cantClientes = 10;
-int indiceClienteActual; // Indice del cliente que inicio sesión.
+const int cantClientes = 10; // Cantidad de clientes
+int indiceClienteActual;     // Indice del cliente que inicio sesión y poder acceder a sus datos.
 
+// ----- PROTOTIPOS -----
 void cargarClientes(int nroCuentaCliente[], char contraseniaCliente[][20], char nombreCliente[][20], float saldoCliente[], char estadoCliente[][10]);
 int iniciarSesion(int nroCuentaCliente[], char contraseniaCliente[][20], char estadoCliente[][10], int intentos);
 void depositarSaldo(float saldoCliente[]);
@@ -19,8 +20,7 @@ void retirarSaldo(float saldoCliente[]);
 
 void main()
 {
-    // DATOS CLIENTE
-
+    // DATOS DEL CLIENTE
     int nroCuentaCliente[cantClientes];
     char contraseniaCliente[cantClientes][20];
     char nombreCliente[cantClientes][20];
@@ -28,44 +28,48 @@ void main()
     char estadoCliente[cantClientes][10]; // [ACTIVO/BLOQUEADO]
 
     // OTRAS VARIABLES:
-    int sesionIniciada;
-    int intentosLogin;
-    int opcionMenu;
-    int intentosOperaciones;
-    int cajeroEstado = 1; // Para que el cajero se reinicie al cerrar sesion
+    int sesionIniciada;      // Bandera de login
+    int intentosLogin;       // Para limitar los intentos del login
+    int opcionMenu;          // Para moverse por el menu
+    int intentosOperaciones; // Para limitar las operaciones
+    int cajeroEstado = 1;    // Para que el cajero se reinicie al cerrar sesion y funcione infinitamente
 
+    // Cargamos los clientes y sus datos
     cargarClientes(nroCuentaCliente, contraseniaCliente, nombreCliente, saldoCliente, estadoCliente);
 
+    // Encerramos el codigo en un bucle para que funcione infinitamente
     while (cajeroEstado = 1)
     {
+        // Inicializamos las variables
         sesionIniciada = 0;
         intentosOperaciones = 0;
         intentosLogin = 1;
 
-        // ----------- LOGIN -----------
+        // ----- LOGIN -----
         do
         {
+            // Llamamos a la funcion para el login, y segun el valor que nos retorne validamos la sesion
             sesionIniciada = iniciarSesion(nroCuentaCliente, contraseniaCliente, estadoCliente, intentosLogin);
 
-            if (sesionIniciada == 0)
+            if (sesionIniciada == 0) // Si ingresa mal el numero de cuenta y contraseña
             {
                 printf("N%cmero de cuenta o contrase%ca incorrecta\n", 163, 164);
                 intentosLogin++;
             }
-            else if (sesionIniciada == -1)
+            else if (sesionIniciada == -1) // Si la cuenta se encuentra bloqueada
             {
                 printf("\nSu cuenta se encuentra bloqueada, comun%cquese con la entidad bancaria para su restablecimiento\n", 161);
             }
-            else if (sesionIniciada == 2)
+            else if (sesionIniciada == 2) // Si ingresa bien el numero de cuenta pero mal la contraseña (al primer intento)
             {
-                printf("\nNo se permiten m%cs intentos. Su cuenta ha sido bloqueada, comun%cquese con la entidad bancaria para su restablecimiento.\n", 160, 161);
+                // Informamos su bloqueo de cuenta
+                printf("\nContrase%ca incorrecta. Su cuenta ha sido bloqueada, comun%cquese con la entidad bancaria para su restablecimiento.\n", 164, 160, 161);
             }
 
-        } while (sesionIniciada == 0 && intentosLogin <= 3 );
-        if (intentosLogin > 3)
+        } while (sesionIniciada == 0 && intentosLogin <= 3);
+        if (intentosLogin > 3) // Si alcanzo el limite de intentos
         {
             printf("\nNo se permiten m%cs intentos.\n", 160);
-            // FALTA BLOQUEAR CUENTA POR LIMITE DE INTENTOS
         }
 
         // ----------- MENU -----------
@@ -74,7 +78,7 @@ void main()
         {
             system("cls");
 
-            do
+            do // Mostramos el menu mientras no ingrese 5 o no alcance el limite de operaciones
             {
                 printf("\n------ Bienvenido/a %s ------\n", nombreCliente[indiceClienteActual]);
                 printf("1)  Dep%csito.\n2)  Extracci%cn.\n3)  Consultar saldo.\n4)  Mostrar saldo y la cantidad de operaciones realizadas.\n5)  Cerrar Sesi%cn.\n", 162, 162, 162);
@@ -86,17 +90,17 @@ void main()
                 case 1:
                     // Depositar Saldo
                     depositarSaldo(saldoCliente);
-                    intentosOperaciones = intentosOperaciones + 1;
+                    intentosOperaciones = intentosOperaciones + 1; // Iteramamos el valor de operaciones realizadas
                     break;
                 case 2:
                     // Extraer Saldo
                     retirarSaldo(saldoCliente);
-                    intentosOperaciones = intentosOperaciones + 1;
+                    intentosOperaciones = intentosOperaciones + 1; // Iteramamos el valor de operaciones realizadas
                     break;
                 case 3:
                     // Mostrar Saldo
                     printf("Saldo: $%0.2f\n", saldoCliente[indiceClienteActual]);
-                    intentosOperaciones = intentosOperaciones + 1;
+                    intentosOperaciones = intentosOperaciones + 1; // Iteramamos el valor de operaciones realizadas
                     break;
                 case 4:
                     // Mostrar saldo y la cantidad de operaciones
@@ -107,72 +111,81 @@ void main()
                     // Salir
                     break;
                 default:
+                    // Si no ingresa ninguna opcion de la lista:
                     printf("Opci%cn inv%clida.\n", 162, 160);
                     break;
                 }
 
             } while (opcionMenu != 5 && intentosOperaciones < 10);
         }
+        // Si alcanza el limite de operaciones realizadas:
         if (intentosOperaciones >= 10)
         {
             printf("Lleg%c al limite de operaciones. Fin. Gracias!\n", 162);
         }
+        // Se vuelve a ejecutar el programa desde el inicio y las variables se vuelven a inicializar
     }
-
-    printf("\n");
-    system("pause");
 }
 
+// ----- LOGIN -----
 int iniciarSesion(int nroCuentaCliente[], char contraseniaCliente[][20], char estadoCliente[][10], int intentos)
 {
     int i = 0;
-
-    int login = 0;
+    int login = 0; // Variable a retornar (Si retorna 0 es porque no cumple con ninguna condicion y el cliente ingreso mal el numero de cuenta y la contraseña)
     int nroCuenta;
     char contrasenia[20];
 
     printf("\n------ INTENTO [%i/3] ------\n", intentos);
     printf("Ingrese su n%cmero de cuenta: ", 163);
     scanf("%i", &nroCuenta);
-
     printf("Ingrese contrase%ca: ", 164);
     scanf("%s", &contrasenia);
 
+    // Bucle para buscar entre todos los indices
     while (i < cantClientes)
     {
+        // Si ingresa bien el numero de cuenta:
         if (nroCuenta == nroCuentaCliente[i])
         {
+            // Si ingresa bien la contraseña:
             if (strcmp(contraseniaCliente[i], contrasenia) == 0)
             {
+                // Si el estado esta ACTIVO:
                 if (strcmp(estadoCliente[i], "ACTIVO") == 0)
                 {
-                    login = 1;
-                    indiceClienteActual = i;
+                    login = 1;               // Retornamos 1
+                    indiceClienteActual = i; // Le damos el valor a la variable global del cliente que inicio sesion
                 }
+
+                // Si el estado esta BLOQUEADO
                 else
                 {
-                    login = -1;
+                    login = -1; // Retornamos -1
                 }
-                break;
+
+                break; // Forzamos la salida del bucle
             }
+            // Si ingresa mal la contraseña:
             else
             {
-
-                strcpy(estadoCliente[i], "BLOQUEADO\n");
-                login = 2;
+                // Se le bloquea la cuenta al primer intento de contraseña incorrecta
+                strcpy(estadoCliente[i], "BLOQUEADO\n"); // Cambiamos su estado a BLOQUEADO
+                login = 2;                               // Retornamos 2
             }
         }
-        i++;
+
+        i++; // Iteramos
     }
 
-    return login;
+    return login; // Retornamos el valor de login
 }
 
+// ----- Depositar saldo -----
 void depositarSaldo(float saldoCliente[])
 {
     float saldoADepositar;
 
-    do
+    do // Depositamos el saldo mientras ingrese un valor mayor a 0
     {
         printf("Ingrese la cantidad de saldo a depositar: ");
         scanf("%f", &saldoADepositar);
@@ -185,11 +198,12 @@ void depositarSaldo(float saldoCliente[])
     printf("Dep%csito realizado con exito.\n", 162);
 }
 
+// ----- Retirar saldo -----
 void retirarSaldo(float saldoCliente[])
 {
     float saldoARetirar;
 
-    do
+    do // Retiramos el saldo mientras ingrese un valor mayor a 0 y menor o igual al saldo actual
     {
         printf("Ingrese la cantidad de dinero a retirar: ");
         scanf("%f", &saldoARetirar);
@@ -207,6 +221,7 @@ void retirarSaldo(float saldoCliente[])
     printf("Extracci%cn exitosa.\n", 162);
 }
 
+// ----- Carga de clientes -----
 void cargarClientes(int nroCuentaCliente[], char contraseniaCliente[][20], char nombreCliente[][20], float saldoCliente[], char estadoCliente[][10])
 {
     // Cliente 1
